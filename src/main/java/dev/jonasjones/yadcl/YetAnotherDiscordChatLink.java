@@ -28,7 +28,5 @@ public class YetAnotherDiscordChatLink implements ModInitializer {
         DiscordBot.startBot();
         // send starting message
         sendToDiscord("Server is starting up.");
-
-
     }
 }

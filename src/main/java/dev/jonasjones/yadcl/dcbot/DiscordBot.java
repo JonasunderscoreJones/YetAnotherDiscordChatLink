@@ -1,12 +1,13 @@
 package dev.jonasjones.yadcl.dcbot;
 
+import dev.jonasjones.yadcl.config.ModConfigs;
 import lombok.Setter;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
-import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.channel.TextChannel;
+
+import java.util.concurrent.TimeUnit;
 
 import static dev.jonasjones.yadcl.YetAnotherDiscordChatLink.LOGGER;
 
@@ -25,7 +26,7 @@ public class DiscordBot {
         }
 
         try {
-            registerServerTickEvent();
+            registerEvents();
             api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
             api.addMessageCreateListener(event -> {
                 // Check if the message is from the specific channel by comparing channel IDs
@@ -40,8 +41,24 @@ public class DiscordBot {
                     minecraftServer.getPlayerManager().broadcast(Text.of(discordMessage), false);
                 }
             });
+            // Set the bot status
+            if (ModConfigs.BOT_STATUS.equals("Uptime")) {
+                new Thread(() -> {
+                    while (isBotRunning) {
+                        botStatus(ModConfigs.BOT_STATUS);
+                        try {
+                            Thread.sleep(60000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            } else {
+                botStatus(ModConfigs.BOT_STATUS);
+            }
         } catch (Exception e) {
             LOGGER.error("Failed to start Discord bot. Check the provided discord token in the config file.");
+            return;
         }
         isBotRunning = true;
     }
@@ -59,21 +76,76 @@ public class DiscordBot {
             return;
         }
         // Get the text channel by its ID
-        TextChannel channel = api.getTextChannelById(targetChannelId).orElse(null);
-
-        // Check if the channel exists and send the message
-        if (channel != null) {
-            channel.sendMessage(message);
-        } else {
-            // Handle the case where the channel does not exist
+        try {
+            TextChannel channel = api.getTextChannelById(targetChannelId).orElse(null);
+            // Check if the channel exists and send the message
+            if (channel != null) {
+                channel.sendMessage(message);
+            } else {
+                throw new Exception("Discord Channel does not exist!");
+            }
+        } catch (Exception e) {
             LOGGER.error("Discord Channel does not exist!");
         }
     }
 
-    private static void registerServerTickEvent() {
+    private static void registerEvents() {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             // This code is executed on every server tick
             minecraftServer = server;
         });
+
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            sendToDiscord("Server is started!");
+        });
+
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            sendToDiscord("Server is stopped!");
+            stopBot();
+        });
+    }
+
+    public static void botStatus(String status) {
+        if (!isBotRunning) {
+            return;
+        }
+        switch (status) {
+            case "None" -> api.updateActivity("");
+            case "PlayerCount" ->
+                    api.updateActivity("Player Count: " + minecraftServer.getCurrentPlayerCount() + "/" + minecraftServer.getMaxPlayerCount());
+            case "IP" -> api.updateActivity("IP: " + minecraftServer.getServerIp());
+            case "Uptime" -> api.updateActivity("Uptime: " + calculateUptime());
+            default -> api.updateActivity(null);
+        }
+    }
+
+    private static String calculateUptime() {
+        long secs = System.currentTimeMillis() - minecraftServer.getTicks() / 20;
+        long days = TimeUnit.SECONDS.toDays(secs);
+        secs -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.SECONDS.toHours(secs);
+        secs -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.SECONDS.toMinutes(secs);
+
+        StringBuilder duration = new StringBuilder();
+        if (days > 0) {
+            duration.append(days).append(" Days, ");
+        }
+        if (hours > 0 || days > 0) {
+            if (hours == 1) {
+                duration.append(hours).append(" Hour, ");
+            } else {
+                duration.append(hours).append(" Hours, ");
+            }
+        }
+        if (minutes > 0 || hours > 0 || days > 0) {
+            if (minutes == 1) {
+                duration.append(minutes).append(" Minute, ");
+            } else {
+                duration.append(minutes).append(" Minutes, ");
+            }
+        }
+
+        return duration.toString();
     }
 }

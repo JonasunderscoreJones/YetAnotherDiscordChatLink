@@ -1,5 +1,6 @@
 package dev.jonasjones.yadcl.mixin;
 
+import dev.jonasjones.yadcl.config.ModConfigs;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,13 +14,8 @@ import static dev.jonasjones.yadcl.dcbot.DiscordBot.stopBot;
 public class ServerStopMixin {
     @Inject(at = @At("HEAD"), method = "shutdown")
     private void init(CallbackInfo info) {
-        sendToDiscord("Server is shutting down.");
-        //wait 2 seconds for the message to send
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (ModConfigs.SERVER_START_STOP_MSG) {
+            sendToDiscord("Server is shutting down.");
         }
-        stopBot();
     }
 }

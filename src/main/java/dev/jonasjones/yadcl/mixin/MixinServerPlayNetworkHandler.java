@@ -1,5 +1,6 @@
 package dev.jonasjones.yadcl.mixin;
 
+import dev.jonasjones.yadcl.config.ModConfigs;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -18,7 +19,9 @@ public abstract class MixinServerPlayNetworkHandler {
 
 	@Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
 	private void onChatMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
-		String messageContent = packet.chatMessage(); // Get the content of the chat message
-		sendToDiscord("<" + this.player.getDisplayName().getString() + "> " + messageContent);
+		if (ModConfigs.PLAYER_CHAT_MSG) {
+			String messageContent = packet.chatMessage(); // Get the content of the chat message
+			sendToDiscord("<" + this.player.getDisplayName().getString() + "> " + messageContent);
+		}
 	}
 }
