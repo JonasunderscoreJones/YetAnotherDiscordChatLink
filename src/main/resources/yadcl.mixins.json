@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "dev.jonasjones.yadcl.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"MixinServerPlayNetworkHandler",
+		"PlayerManagerMixin",
+		"ServerStopMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

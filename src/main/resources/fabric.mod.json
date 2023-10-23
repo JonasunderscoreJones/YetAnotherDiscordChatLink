@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "yadcl",
+	"version": "${version}",
+	"name": "Yet Another Discord Chat Link",
+	"description": "A mod that allows you to link your Minecraft chat to a Discord channel.",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://jonasjones.dev/",
+		"sources": "https://github.com/J-onasJones/YetAnotherDiscordChatLink"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/yadcl/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.jonasjones.yadcl.YetAnotherDiscordChatLink"
+		]
+	},
+	"mixins": [
+      "yadcl.mixins.json",
+		{
+			"config": "modid.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.14.22",
+		"minecraft": "~1.20.2",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
