@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static dev.jonasjones.yadcl.dcbot.DiscordBot.botStatus;
+//import static dev.jonasjones.yadcl.dcbot.DiscordBot.botStatus;
 import static dev.jonasjones.yadcl.dcbot.DiscordBot.sendToDiscord;
 
 @Mixin(PlayerManager.class)
@@ -19,9 +19,9 @@ public class PlayerManagerMixin {
     public void onPlayerConnect​(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
         if (ModConfigs.PLAYER_JOIN_LEAVE_MSG) {
             sendToDiscord(player.getDisplayName().getString() + " joined the game");
-            if (ModConfigs.BOT_STATUS.equals("PlayerCount")) {
+            /*if (ModConfigs.BOT_STATUS.equals("PlayerCount")) {
                 botStatus(ModConfigs.BOT_STATUS);
-            }
+            }*/
         }
     }
 
@@ -29,9 +29,9 @@ public class PlayerManagerMixin {
     public void remove(ServerPlayerEntity player, CallbackInfo ci) {
         if (ModConfigs.PLAYER_JOIN_LEAVE_MSG) {
             sendToDiscord(player.getDisplayName().getString() + " left the game");
-            if (ModConfigs.BOT_STATUS.equals("PlayerCount")) {
+            /*if (ModConfigs.BOT_STATUS.equals("PlayerCount")) {
                 botStatus(ModConfigs.BOT_STATUS);
-            }
+            }*/
         }
     }
 }

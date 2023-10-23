@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static dev.jonasjones.yadcl.dcbot.DiscordBot.sendToDiscord;
-import static dev.jonasjones.yadcl.dcbot.DiscordBot.stopBot;
 
 @Mixin(MinecraftServer.class)
 public class ServerStopMixin {

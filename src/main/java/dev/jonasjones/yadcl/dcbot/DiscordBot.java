@@ -45,7 +45,7 @@ public class DiscordBot {
                 }
             });
             // Set the bot status
-            if (ModConfigs.BOT_STATUS.equals("Uptime")) {
+            /*if (ModConfigs.BOT_STATUS.equals("Uptime")) {
                 new Thread(() -> {
                     while (isBotRunning) {
                         botStatus(ModConfigs.BOT_STATUS);
@@ -58,7 +58,7 @@ public class DiscordBot {
                 }).start();
             } else {
                 botStatus(ModConfigs.BOT_STATUS);
-            }
+            }*/
         } catch (Exception e) {
             LOGGER.error("Failed to start Discord bot. Check the provided discord token in the config file.");
             return;
@@ -104,11 +104,17 @@ public class DiscordBot {
 
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             sendToDiscord("Server is stopped!");
+            //wait for 2 seconds to make sure the message is sent
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             stopBot();
         });
     }
 
-    public static void botStatus(String status) {
+    /*public static void botStatus(String status) {
         if (!isBotRunning) {
             return;
         }
@@ -150,5 +156,5 @@ public class DiscordBot {
         }
 
         return duration.toString();
-    }
+    }*/
 }
