@@ -60,7 +60,7 @@ tasks.withType(ShadowJar).configureEach {
 	it.minimize()
 	it.configurations = [project.configurations.shadow]
 	it.enableRelocation = true
-	it.relocationPrefix = "dev.jonasjones.dev.impl.vendor"
+	it.relocationPrefix = "dev.jonasjones.yadacl.vendor"
 }
 
 
