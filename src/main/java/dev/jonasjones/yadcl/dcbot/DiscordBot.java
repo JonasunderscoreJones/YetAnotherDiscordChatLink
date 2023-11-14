@@ -6,19 +6,16 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
 import static dev.jonasjones.yadcl.YetAnotherDiscordChatLink.LOGGER;
+import static dev.jonasjones.yadcl.YetAnotherDiscordChatLink.startTime;
 
 public class DiscordBot extends ListenerAdapter {
     private static String token;
@@ -43,14 +40,13 @@ public class DiscordBot extends ListenerAdapter {
         }
 
         try {
-
             // Create the bot
             jda = JDABuilder.createDefault(token)
                     .addEventListeners(new MessageListener())
                     .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                     .build();
             // Set the bot status
-            if (ModConfigs.BOT_STATUS.equals("Uptime")) {
+            if (ModConfigs.BOT_STATUS.equals("Uptime") || ModConfigs.BOT_STATUS.equals("PlayerCount")) {
                 new Thread(() -> {
                     while (isBotRunning) {
                         setBotStatus(ModConfigs.BOT_STATUS);
@@ -100,7 +96,7 @@ public class DiscordBot extends ListenerAdapter {
     private static void registerEvents() {
         ServerTickEvents.START_SERVER_TICK.register(server -> {
             // This code is executed on every server tick
-            minecraftServer = server;
+            DiscordBot.minecraftServer = server;
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
@@ -114,20 +110,18 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     public static void setBotStatus(String statusType) {
-        if (!isBotRunning) {
+        if (!isBotRunning || DiscordBot.minecraftServer == null) {
             return;
         }
-        switch (statusType.toLowerCase()) {
-            case "player count" -> jda.getPresence().setActivity(Activity.playing("Players: 100"));
-            case "ip" -> jda.getPresence().setActivity(Activity.listening("Server IP: example.com"));
-            case "uptime" -> jda.getPresence().setActivity(Activity.watching("Uptime: " + calculateUptime()));
-            default -> System.out.println("Invalid status type!");
+        switch (statusType) {
+            case "PlayerCount" -> jda.getPresence().setActivity(Activity.playing("with " + DiscordBot.minecraftServer.getCurrentPlayerCount() + "/"+ DiscordBot.minecraftServer.getMaxPlayerCount() + " Players"));
+            case "Uptime" -> jda.getPresence().setActivity(Activity.playing("for " + calculateUptime()));
         }
     }
 
     private static String calculateUptime() {
         try {
-            long secs = System.currentTimeMillis() - minecraftServer.getTicks() / 20;
+            long secs = (System.currentTimeMillis() - startTime) / 1000;
             long days = TimeUnit.SECONDS.toDays(secs);
             secs -= TimeUnit.DAYS.toMillis(days);
             long hours = TimeUnit.SECONDS.toHours(secs);
@@ -147,10 +141,14 @@ public class DiscordBot extends ListenerAdapter {
             }
             if (minutes > 0 || hours > 0 || days > 0) {
                 if (minutes == 1) {
-                    duration.append(minutes).append(" Minute, ");
+                    duration.append(minutes).append(" Minute");
                 } else {
-                    duration.append(minutes).append(" Minutes, ");
+                    duration.append(minutes).append(" Minutes");
                 }
+            }
+
+            if (duration.isEmpty()) {
+                return "less than a minute";
             }
 
             return duration.toString();

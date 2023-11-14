@@ -16,6 +16,7 @@ public class YetAnotherDiscordChatLink implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static DiscordBot discordBot;
+    public static final long startTime = System.currentTimeMillis();
 
     @Override
     public void onInitialize() {
