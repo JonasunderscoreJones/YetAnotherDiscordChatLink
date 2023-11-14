@@ -15,17 +15,16 @@ public class YetAnotherDiscordChatLink implements ModInitializer {
     public static final String MOD_ID = "yadcl";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    public static DiscordBot discordBot;
+
     @Override
     public void onInitialize() {
         // Register the config
         ModConfigs.registerConfigs();
 
-        // Set the token and channel id
-        DiscordBot.setToken(ModConfigs.TOKEN);
-        DiscordBot.setTargetChannelId(ModConfigs.CHANNEL_ID);
-
         // Start the bot
-        DiscordBot.startBot();
+        discordBot = new DiscordBot(ModConfigs.TOKEN, ModConfigs.CHANNEL_ID);
+        discordBot.startBot();
         // send starting message
         sendToDiscord("Server is starting up.");
     }

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static dev.jonasjones.yadcl.dcbot.DiscordBot.botStatus;
+import static dev.jonasjones.yadcl.dcbot.DiscordBot.setBotStatus;
 import static dev.jonasjones.yadcl.dcbot.DiscordBot.sendToDiscord;
 
 @Mixin(PlayerManager.class)
@@ -20,7 +20,7 @@ public class PlayerManagerMixin {
         if (ModConfigs.PLAYER_JOIN_LEAVE_MSG) {
             sendToDiscord(player.getDisplayName().getString() + " joined the game");
             if (ModConfigs.BOT_STATUS.equals("PlayerCount")) {
-                botStatus(ModConfigs.BOT_STATUS);
+                setBotStatus(ModConfigs.BOT_STATUS);
             }
         }
     }
@@ -30,7 +30,7 @@ public class PlayerManagerMixin {
         if (ModConfigs.PLAYER_JOIN_LEAVE_MSG) {
             sendToDiscord(player.getDisplayName().getString() + " left the game");
             if (ModConfigs.BOT_STATUS.equals("PlayerCount")) {
-                botStatus(ModConfigs.BOT_STATUS);
+                setBotStatus(ModConfigs.BOT_STATUS);
             }
         }
     }
