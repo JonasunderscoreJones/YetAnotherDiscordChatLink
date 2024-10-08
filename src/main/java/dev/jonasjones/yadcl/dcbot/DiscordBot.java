@@ -112,11 +112,11 @@ public class DiscordBot extends ListenerAdapter {
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            sendToDiscord("Server is started!");
+            sendToDiscord("Server has started!");
         });
 
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            sendToDiscord("Server is stopped!");
+            sendToDiscord("Server has stopped!");
             stopBot();
         });
     }
